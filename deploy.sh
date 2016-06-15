@@ -14,22 +14,23 @@ source $config_file_path
 
 # usage output
 function showUsageAndExit(){
-    echoBold "Test WSO2 Puppet Modules with WSO2 Dockerfiles, WSO2 Kubernetes Artifacts, and WSO2 Mesos Artifacts"
+    echoBold "Deploy WSO2 Products on PaaS platforms with WSO2 Puppet Modules with WSO2 Dockerfiles, WSO2 Kubernetes Artifacts, and WSO2 Mesos Artifacts"
     echo
     echoBold "Usage: ./${me} -v [product_code:product_version] [OPTIONS]"
     echo
     echo
     echoBold "Options:"
-    echo -e " \t-p  - Test Puppet with standalone Vagrant test setup"
-    echo -e " \t-d  - Test Puppet with WSO2 Dockerfiles. Builds and runs Docker images."
-    echo -e " \t-k  - Test Puppet with WSO2 Kubernetes Artifacts and WSO2 Dockerfiles. Build Docker images, and deploys Kubernetes artifacts in a given Kubernetes cluster."
+    echo -e " \t-p  - Deployment platform. The value specified will be used as the deployment script name to be invoked. ex: \"-p mesos\" will invoke mesos.sh"
     echo -e " \t-l  - Specify the list of profiles to use for testing. \"|\" delimitted."
     echo -e " \t-s  - Persist temporarily prepared PUPPET_HOME."
+    echo -e " \t-o  - Clean and repopulate PUPPET_HOME."
     echo -e " \t-h  - Show usage"
     echo
     echo
     echoBold "Example:"
     echo "./${me} -v esb:4.9.0"
+    echo "./${me} -v esb:4.9.0 -p docker"
+    echo "./${me} -v esb:4.9.0 -p kubernetes"
 
     exit 0
 }
@@ -108,10 +109,10 @@ function checkProductPlatform () {
 ##################################### START ####################################
 # default values
 profiles='default'
-test_platform=""
+deployment_platform=""
 override_puppet=false
 
-while getopts :v:l:t:o FLAG; do
+while getopts :v:l:p:o FLAG; do
     case $FLAG in
         v)
             prod_version=$OPTARG
@@ -119,8 +120,8 @@ while getopts :v:l:t:o FLAG; do
             product="${prod_v_array[0]}"
             version="${prod_v_array[1]}"
             ;;
-        t)
-            test_platform=$OPTARG
+        p)
+            deployment_platform=$OPTARG
             ;;
         l)
             profiles=$OPTARG
@@ -141,15 +142,15 @@ checkRequiredInput
 checkProductPlatform
 setupPuppetHome
 
-if [ -z $test_platform ] || [ $test_platform == "" ]; then
+if [ -z $deployment_platform ] || [ $deployment_platform == "" ]; then
     echoSuccess "Done"
     exit 0
 fi
 
-if [ ! -f $DIR/$test_platform.sh ]; then
-    echoError "Cannot find test implementation $DIR/${test_platform}.sh. Aborting!"
+if [ ! -f $DIR/$deployment_platform.sh ]; then
+    echoError "Cannot find test implementation $DIR/${deployment_platform}.sh. Aborting!"
     exit 1
 else
     # TODO: support multiple tests at once
-    bash $DIR/$test_platform.sh $product $version $profiles
+    bash $DIR/$deployment_platform.sh $product $version $profiles
 fi
