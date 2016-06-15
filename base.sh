@@ -36,7 +36,7 @@ function askBold () {
 # $1 Message header
 # $2 Message
 function notifyError () {
-    notifyMsg $1 $2 software-update-urgent
+    notifyMsg "$1" "$2" software-update-urgent
 }
 
 # $1 Message header
@@ -146,8 +146,13 @@ function verifyPuppetModulesHome(){
                 echoError "wso2/puppet-modules is not at the specified version [$PUPPET_MODULES_VERSION], and cannot be automatically switched because there are local uncommitted changes."
                 exit 1
             else
-                git checkout -b v$PUPPET_MODULES_VERSION
-                echo "Switched to local branch v$PUPPET_MODULES_VERSION"
+                if [ "$PUPPET_MODULES_VERSION" != "latest" ]; then
+                    git checkout -b v$PUPPET_MODULES_VERSION
+                    echo "Switched to local branch v$PUPPET_MODULES_VERSION"
+                else
+                    git checkout master
+                    echo "Switched to master branch"
+                fi
             fi
         fi
     } || {
@@ -194,8 +199,13 @@ function verifyDockerfilesHome () {
                 echoError "wso2/dockerfiles is not at the specified version [$DOCKERFILES_VERSION], and cannot be automatically switched because there are local uncommitted changes."
                 exit 1
             else
-                git checkout -b v$DOCKERFILES_VERSION
-                echo "Switched to local branch v$DOCKERFILES_VERSION"
+                if [ "$DOCKERFILES_VERSION" != "latest" ]; then
+                    git checkout -b v$DOCKERFILES_VERSION
+                    echo "Switched to local branch v$DOCKERFILES_VERSION"
+                else
+                    git checkout master
+                    echo "Switched to master branch"
+                fi
             fi
         fi
     } || {
@@ -242,8 +252,13 @@ function verifyKubernetesHome () {
                 echoError "wso2/kubernetes-artifacts is not at the specified version [$KUBERNETES_VERSION], and cannot be automatically switched because there are local uncommitted changes."
                 exit 1
             else
-                git checkout -b v$KUBERNETES_VERSION
-                echo "Switched to local branch v$KUBERNETES_VERSION"
+                if [ "$KUBERNETES_VERSION" != "latest" ]; then
+                    git checkout -b v$KUBERNETES_VERSION
+                    echo "Switched to local branch v$KUBERNETES_VERSION"
+                else
+                    git checkout master
+                    echo "Switched to master branch"
+                fi
             fi
         fi
     } || {

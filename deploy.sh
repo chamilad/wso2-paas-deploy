@@ -148,7 +148,7 @@ if [ -z $deployment_platform ] || [ $deployment_platform == "" ]; then
 fi
 
 if [ ! -f $DIR/$deployment_platform.sh ]; then
-    echoError "Cannot find test implementation $DIR/${deployment_platform}.sh. Aborting!"
+    echoError "Cannot find deployment implementation $DIR/${deployment_platform}.sh. Aborting!"
     exit 1
 else
     # TODO: support multiple tests at once

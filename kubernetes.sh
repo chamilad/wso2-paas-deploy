@@ -38,10 +38,15 @@ fi
 
 echoDim "Building Kubernetes Membership Scheme..."
 pushd "${KUBERNETES_HOME}/common/kubernetes-membership-scheme" > /dev/null 2>&1
+# get the current K8S Membership Scheme version
 ver_line=$(sed '30q;d' ../../pom.xml)
 kube_membership_scheme_version=$(grep -oPm1 "(?<=<version>)[^<]+" <<< "$ver_line")
+
 mvn clean install > /dev/null 2>&1 || { echoError "Couldn't build Kubernetes Membership Scheme"; exit 1; }
 popd > /dev/null 2>&1
+
+echoDim "Setting Kubernetes Membeship Scheme version in Puppet..."
+sed -i "s/.*kubernetes-membership-scheme-.*/  - repository\/components\/lib\/kubernetes-membership-scheme-${kube_membership_scheme_version}.jar/" $PUPPET_HOME/hieradata/dev/platform/kubernetes.yaml
 
 pushd "${PUPPET_HOME}/modules/wso2${product}/files/configs/repository/components/lib/" > /dev/null 2>&1
 echoDim "Copying Kubernetes Membership Scheme dependencies..."
@@ -79,14 +84,29 @@ echo
 echoDim "Deploying WSO2 ${product^^} ${version} on Kubernetes (${KUBERNETES_MASTER})..."
 
 # check if product has distributed deployment in kubernetes artifacts
-list_of_profiles=$(find wso2${product}/ -name "wso2${product}*-controller.yaml" | cut -d'-' -f2)
+list_of_profiles=$(find ${KUBERNETES_HOME}/wso2${product}/ -name "wso2${product}*-controller.yaml" | cut -d'-' -f2)
 if [ "$list_of_profiles" == "default" ]; then
+  if [ "$profiles" != "default" ]; then
+    echoError "Multiple profiles have been specified, but there are Kubernetes artifacts for only the default profile. Aborting!"
+    exit 1
+    # askBold "Continue? (y/n): "
+    # read -r continue_v
+    # if [ "$continue_v" != "y" ]; then
+    #   exit 1
+    # fi
+  fi
+
   deploy_flags=""
 else
-  deploy_flags="-d"
+  if [ "$profiles" == "default" ]; then
+    deploy_flags=""
+  else
+    deploy_flags="-d"
+  fi
 fi
 
 timeout --preserve-status 5m bash deploy.sh "$deploy_flags"
+# bash deploy.sh "$deploy_flags"
 
 if [ $? -ne 0 ]; then
     echo

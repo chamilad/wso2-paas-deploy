@@ -9,7 +9,7 @@ export MESOS_HOME=/home/chamilad/dev/wso2/mesos-artifacts
 
 # versions
 export PUPPET_MODULES_VERSION="latest"
-export KUBERNETES_VERSION="1.0.0"
+export KUBERNETES_VERSION="latest"
 export DOCKERFILES_VERSION="1.1.0"
 export MESOS_VERSION="latest"
 
