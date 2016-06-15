@@ -1,0 +1,24 @@
+# Eclipse Project Files
+.project
+.classpath
+.settings/
+.metadata
+
+# IntelliJ IDEA Project Files
+.idea/
+*.iml
+*.ipr
+*.iws
+*.swp
+
+#Backup files
+*~
+
+# Zip archives
+*.zip
+*.gz
+*.tar
+
+*-hashes/
+
+conf.sh
