@@ -43,7 +43,6 @@ function notifyError () {
 # $2 Message
 # $3 Message icon
 function notifyMsg () {
-    echo "DDD : $1 $2 $3    "
     if [ $OSTYPE == "linux-gnu" ]; then
         notify-send -i $3 "$1" "$2"
     fi
@@ -60,8 +59,9 @@ function checkCommandExists(){
 # $2 Hostname
 function addHostsEntry () {
     echoDim "Adding $1:$2 to /etc/hosts"
-    export PT_HOSTS_ENTRY="$1   ${wso2_hostname}"
-    echo $PT_HOSTS_ENTRY | sudo tee -a /etc/hosts >> /dev/null
+    export hosts_entry="$1 ${wso2_hostname}"
+    export PT_HOSTS_ENTRY=$wso2_hostname
+    echo $hosts_entry | sudo tee -a /etc/hosts >> /dev/null
     echoDim "Hosts entry added"
     echo
 }
@@ -91,13 +91,13 @@ function addPuppetHostsEntry () {
 }
 
 function removeAddedHostsEntry () {
-    if [ -z $PT_HOSTS_ENTRY ]; then
+    if [ -z PT_HOSTS_ENTRY ]; then
         echoError "No hosts file entries have been added. Skipping..."
         return 1
     fi
 
-    echoDim "Removing /etc/hosts entry"
-    sudo sed -i "/${PT_HOSTS_ENTRY}/d" /etc/hosts
+    echoDim "Removing /etc/hosts entry: \"${PT_HOSTS_ENTRY}\""
+    sudo sed -i "/$PT_HOSTS_ENTRY/d" /etc/hosts
     unset PT_HOSTS_ENTRY
 }
 

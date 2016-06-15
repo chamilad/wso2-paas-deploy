@@ -139,7 +139,7 @@ while getopts :v:l:p:o FLAG; do
 done
 
 checkRequiredInput
-checkProductPlatform
+checkProductPlatform $product $version
 setupPuppetHome
 
 if [ -z $deployment_platform ] || [ $deployment_platform == "" ]; then

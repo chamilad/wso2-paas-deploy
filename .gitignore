@@ -19,6 +19,4 @@
 *.gz
 *.tar
 
-*-hashes/
-
 conf.sh
